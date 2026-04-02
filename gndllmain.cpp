@@ -1,4 +1,3 @@
-/* Replace "dll.h" with the name of your header */
 #include "gndll.h"
 #include <windows.h>
 #include <cmath>
