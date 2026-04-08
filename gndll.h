@@ -1,5 +1,5 @@
-#ifndef _DLL_H_
-#define _DLL_H_
+#ifndef _GNDLL_H_
+#define _GNDLL_H_
 #include <windows.h>
 #include <cmath>
 #include <cstddef>
@@ -12,7 +12,7 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
-int DLLIMPORT logarithm(int base, int result);
+double DLLIMPORT logarithm(int base, int result);
 void DLLIMPORT INIT_COUNTER();
 void DLLIMPORT ADD_COUNTER();
 int DLLIMPORT GET_COUNTER();
@@ -32,6 +32,7 @@ void DLLIMPORT set_console_color(int col);
 void DLLIMPORT rtimer();
 void DLLIMPORT itimer();
 const char* DLLIMPORT log_message(const char* msg, const char* type);
+int DLLIMPORT randomint(int min, int max);
 #ifdef __cplusplus
 }
 #endif

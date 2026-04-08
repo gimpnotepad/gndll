@@ -4,29 +4,32 @@
 #include <cstddef>
 #include <cstring>
 #include <stdio.h>
+#include <random>
+
+#define GNDLL __declspec(dllexport) WINAPI
 extern "C"{
 static int counter = 0;
 static LARGE_INTEGER start_time;
 static LARGE_INTEGER freq;
 static bool init_timer = false;
-__declspec(dllexport) int WINAPI logarithm(int base, int result){
+GNDLL double logarithm(int base, int result){
 	if (base <= 1 || result <= 0) {
 		return 0;
 	}
-	return (int)(std::log(result)/std::log(base));
+	return std::log(result)/std::log(base);
 }
-__declspec(dllexport) void WINAPI INIT_COUNTER(){
+GNDLL void INIT_COUNTER(){
 	counter = 0;
 }
-__declspec(dllexport) void WINAPI ADD_COUNTER(){
+GNDLL void ADD_COUNTER(){
 	counter = counter + 1;
 }
-__declspec(dllexport) int WINAPI GET_COUNTER(){
+GNDLL int GET_COUNTER(){
 	return counter;
 }
 
 
-__declspec(dllexport) void WINAPI fastprint(const char* str, size_t len){
+GNDLL void fastprint(const char* str, size_t len){
 	if (len == 0) len = std::strlen(str);
 	HANDLE  hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (hStdOut == INVALID_HANDLE_VALUE) return;
@@ -34,7 +37,7 @@ __declspec(dllexport) void WINAPI fastprint(const char* str, size_t len){
 	WriteFile(hStdOut, str, static_cast<DWORD>(len), &written, nullptr);
 }
 
-__declspec(dllexport) int WINAPI sum(int start, int end){
+GNDLL int sum(int start, int end){
 	int m;
 	for (int i = start; i<(end+1); i++){
 		m += i;
@@ -42,7 +45,7 @@ __declspec(dllexport) int WINAPI sum(int start, int end){
 	return m;
 }
 
-__declspec(dllexport) int WINAPI prod(int start, int end){
+GNDLL int prod(int start, int end){
 	int m = 1;
 	for (int i = start; i<(end+1); i++){
 		m *= i;
@@ -50,7 +53,7 @@ __declspec(dllexport) int WINAPI prod(int start, int end){
 	return m;
 }
 
-__declspec(dllexport) int WINAPI cp1251_2_utf8(const char* input, char* output, int out_size){
+GNDLL int cp1251_2_utf8(const char* input, char* output, int out_size){
 	int ws = MultiByteToWideChar(1251,0,input,-1,NULL,0);
 	if (!ws) return 0;
 	wchar_t* wide = new wchar_t[ws];
@@ -63,21 +66,21 @@ __declspec(dllexport) int WINAPI cp1251_2_utf8(const char* input, char* output, 
 	delete[] wide;
 	return utf8_s;
 }
-__declspec(dllexport) int WINAPI signum(double val){
+GNDLL int signum(double val){
 	return (0 < val) - (val < 0);
 }
-__declspec(dllexport) double WINAPI clamp_gn(double val, double min, double max){
+GNDLL double clamp_gn(double val, double min, double max){
 	if (val < min) return min;
 	if (val > max) return max;
 	return val;
 }
-__declspec(dllexport) double WINAPI lerp_gn(double a, double b, double t){
+GNDLL double lerp_gn(double a, double b, double t){
 	return a + t * (b - a);
 }
-__declspec(dllexport) double WINAPI get_pi(){
+GNDLL double get_pi(){
 	return 3.14159265358979323846;
 }
-__declspec(dllexport) const char* WINAPI get_pc_name(){
+GNDLL const char* get_pc_name(){
 	static char buffer[MAX_COMPUTERNAME_LENGTH+1];
 	DWORD size = sizeof(buffer);
 	if(GetComputerNameA(buffer, &size)){
@@ -85,7 +88,7 @@ __declspec(dllexport) const char* WINAPI get_pc_name(){
 	}
 	return "";
 }
-__declspec(dllexport) const char* WINAPI get_user_name(){
+GNDLL const char* get_user_name(){
 	static char buffer[256];
 	DWORD size = sizeof(buffer);
 	if(GetUserNameA(buffer,&size)){
@@ -93,7 +96,7 @@ __declspec(dllexport) const char* WINAPI get_user_name(){
 	}
 	return "";
 }
-__declspec(dllexport) const char* WINAPI get_nt_ver(){
+GNDLL const char* get_nt_ver(){
 	static char buffer[16];
 	OSVERSIONINFO osvi;
 	ZeroMemory(&osvi,sizeof(OSVERSIONINFO));
@@ -105,7 +108,7 @@ __declspec(dllexport) const char* WINAPI get_nt_ver(){
 	}
 	return "Unknown NT";
 }
-__declspec(dllexport) const char* WINAPI get_sysarch(){
+GNDLL const char* get_sysarch(){
 	SYSTEM_INFO si;
 	GetNativeSystemInfo(&si);
 	
@@ -116,21 +119,21 @@ __declspec(dllexport) const char* WINAPI get_sysarch(){
 	}
 	return "Unknown arch";
 }
-__declspec(dllexport) void WINAPI set_console_color(int col){
+GNDLL void set_console_color(int col){
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	SetConsoleTextAttribute(hConsole, col);
 }
-__declspec(dllexport) void WINAPI itimer(){
+GNDLL void itimer(){
 	if (!init_timer){
 		QueryPerformanceFrequency(&freq);
 		QueryPerformanceCounter(&start_time);
 		init_timer = true;
 	}
 }
-__declspec(dllexport) void WINAPI rtimer(){
+GNDLL void rtimer(){
 	QueryPerformanceCounter(&start_time);
 }
-__declspec(dllexport) const char* WINAPI log_message(const char* msg, const char* type){
+GNDLL const char* log_message(const char* msg, const char* type){
 	itimer();
 	LARGE_INTEGER now;
 	QueryPerformanceCounter(&now);
@@ -138,6 +141,12 @@ __declspec(dllexport) const char* WINAPI log_message(const char* msg, const char
 	thread_local char buffer[4096];
 	snprintf(buffer, sizeof(buffer), "[%.4f] [%s] %s\n", elapsed, type, msg);
 	return buffer;
+}
+GNDLL int randomint(int min, int max) {
+	static std::random_device rd;
+	static std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dist(min, max);
+	return dist(gen);
 }
 }
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,DWORD fdwReason,LPVOID lpvReserved)
