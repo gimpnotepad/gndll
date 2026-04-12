@@ -57,6 +57,7 @@ GNDLL int cp1251_2_utf8(const char* input, char* output, int out_size){
 	int ws = MultiByteToWideChar(1251,0,input,-1,NULL,0);
 	if (!ws) return 0;
 	wchar_t* wide = new wchar_t[ws];
+	MultiByteToWideChar(1251,0,input,-1,wide,ws);
 	int utf8_s = WideCharToMultiByte(CP_UTF8,0,wide,-1,NULL,0,NULL,NULL);
 	if (utf8_s > out_size){
 		delete[] wide;
