@@ -38,7 +38,7 @@ GNDLL void fastprint(const char* str, size_t len){
 }
 
 GNDLL int sum(int start, int end){
-	int m;
+	int m = 0;
 	for (int i = start; i<(end+1); i++){
 		m += i;
 	}
